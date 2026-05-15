@@ -23,8 +23,7 @@
 
 
 # 2. System context diagram
-![name](https://github.com/Hungu39/OpensourceSW-project/blob/main/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202026-03-27%20145323.png?raw=true)
-
+<img src="../Images/SystemContextDiagram.png" width="800">
 
 
 ******************************************************************************

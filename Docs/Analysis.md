@@ -2,7 +2,7 @@
 
 > **Project Title:** MULTI MINI ARCADE
 > 
-> <img src="./TitleImage.png" width="800">
+> <img src="../Images/TitleImage.png" width="800">
 
 
  **Student No / Name / E-mail:** (22113291, 강헌구, hungu020717@gmail.com)
@@ -46,7 +46,7 @@
 ---
 
 ## 2. Use case analysis
-<img src="./usecase.png" width="800" alt="유스케이스 다이어그램">
+<img src="../Images/usecase.png" width="800" alt="유스케이스 다이어그램">
 
 ### Use case #1 : Connection MasterServer
 | GENERAL CHARACTERISTICS | |
@@ -413,13 +413,13 @@
 ---
 
 ## 4. User Interface prototype
-<img src="./TitlePrototype.png" width="800">
+<img src="../Images/TitlePrototype.png" width="800">
 플레이어가 처음 게임을 실행하면 나오는 화면이다. 닉네임을 입력하고 방 만들기를 누르면 방장으로 방을 만들 수 있고 방 참가를 누르면 만들어져 있는 방에 일반 유저로써 참여 가능하다. 
 
-<img src="./WaitingRoomPrototype.png" width="800">
+<img src="../Images/WaitingRoomPrototype.png" width="800">
 플레이어가 방에 들어왔을 때 나오는 화면이다. 플레이어 2명의 대기상태와 게임 시작 버튼을 누를 수 있다. 
 
-<img src="./Aiming.jpg" width="800">
+<img src="../Images/Aiming.jpg" width="800">
 미니게임 중 에이밍 게임의 화면이다. 플레이어가 마우스로 조준점을 움직일 수 있고 랜덤한 위치에 표적이 순서대로 생겼다가 없어졌다가 할 것이다. 그 표적이 없어지기 전에 플레이어가 마우스로 클릭하면 점수가 오른다. 왼쪽 위에는 제한시간이 표시되고 오른쪽 위에는 상대의 점수가 표시된다. 아래에는 몇 번 연속으로 표적을 맞추는데 성공했는지 표시된다. 
 
 
