@@ -11,7 +11,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         //스크립트가 켜지자 마자 포톤 마스터 서버에 접속해줘라고 요청
         Debug.Log("포톤 마스터 서버에 접속을 시도합니다.");
-
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings(); 
     }
 
