@@ -43,6 +43,7 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks
 
         // 씬에 들어오자마자 현재 방 인원 상태에 맞춰 UI 업데이트
         UpdateRoomUI();
+        PhotonNetwork.AutomaticallySyncScene = true;
     }
 
     // 버튼을 클릭했을 때 실행될 함수 (유니티 OnClick에 연결)
@@ -52,7 +53,7 @@ public class WaitingRoomManager : MonoBehaviourPunCallbacks
         {
             // [방장] 게임 시작 (씬 이름은 실제 게임 씬 이름으로 변경하세요)
             Debug.Log("게임을 시작합니다!");
-            PhotonNetwork.LoadLevel("GameScene");
+            PhotonNetwork.LoadLevel("ReactionGameScene");
         }
         else
         {
