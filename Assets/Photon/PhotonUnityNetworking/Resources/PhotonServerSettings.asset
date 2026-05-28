@@ -47,6 +47,7 @@ MonoBehaviour:
   - RPC_TurnRed
   - RPC_AddAimingScore
   - RPC_StartAimingGame
+  - RPC_StealWord
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
