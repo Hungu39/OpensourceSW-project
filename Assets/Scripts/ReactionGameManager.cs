@@ -1,6 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
-using Photon.Realtime; // 💡 Player 클래스를 쓰기 위해 추가
+using Photon.Realtime;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
@@ -11,8 +11,11 @@ public class ReactionGameManager : MonoBehaviourPun
     public Image backgroundButtonImage;
     public TextMeshProUGUI centerInfoText;
 
-    public TextMeshProUGUI hostInfoText;  // 방장 전광판 (닉네임 표시)
-    public TextMeshProUGUI guestInfoText; // 게스트 전광판 (닉네임 표시)
+    [Header("Result UI")]
+    public GameObject resultPanel;
+    public TextMeshProUGUI resultMessageText;
+    public TextMeshProUGUI hostResultText;
+    public TextMeshProUGUI guestResultText;
 
     private int hostScore = 0;
     private int guestScore = 0;
@@ -30,7 +33,6 @@ public class ReactionGameManager : MonoBehaviourPun
         StartNewRound();
     }
 
-    // 💡 방장의 실제 닉네임을 가져오는 함수
     string GetHostNickName()
     {
         if (PhotonNetwork.MasterClient != null)
@@ -40,18 +42,16 @@ public class ReactionGameManager : MonoBehaviourPun
         return "HOST";
     }
 
-    // 💡 게스트(방장이 아닌 사람)의 실제 닉네임을 가져오는 함수
     string GetGuestNickName()
     {
         foreach (Player p in PhotonNetwork.PlayerList)
         {
-            // 방장이 아닌 플레이어를 찾으면 그 사람의 닉네임 반환
             if (!p.IsMasterClient)
             {
                 return p.NickName;
             }
         }
-        return "GUEST"; // 아직 게스트가 안 들어왔거나 못 찾았을 때 대치어
+        return "GUEST";
     }
 
     void StartNewRound()
@@ -62,12 +62,11 @@ public class ReactionGameManager : MonoBehaviourPun
         hostTime = 0f;
         guestTime = 0f;
 
+        // 💡 게임 시작(대기) 시 결과창을 꺼줍니다.
+        if (resultPanel != null) resultPanel.SetActive(false);
+
         backgroundButtonImage.color = Color.gray;
         centerInfoText.text = "WAIT...";
-
-        // 라운드 시작할 때도 닉네임과 현재 점수를 미리 띄워줌
-        hostInfoText.text = $"{GetHostNickName()}\nScore: {hostScore}";
-        guestInfoText.text = $"{GetGuestNickName()}\nScore: {guestScore}";
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -115,16 +114,14 @@ public class ReactionGameManager : MonoBehaviourPun
     {
         submitCount++;
 
-        // 💡 "Host:", "Guest:" 텍스트 대신 GetHostNickName(), GetGuestNickName() 함수를 넣어줬어!
+        // 여기서는 데이터만 저장합니다.
         if (isHost)
         {
             hostTime = time;
-            hostInfoText.text = $"{GetHostNickName()}: {hostTime:F3}초\nScore: {hostScore}";
         }
         else
         {
             guestTime = time;
-            guestInfoText.text = $"{GetGuestNickName()}: {guestTime:F3}초\nScore: {guestScore}";
         }
 
         if (submitCount == 2)
@@ -135,39 +132,52 @@ public class ReactionGameManager : MonoBehaviourPun
 
     void DetermineWinner()
     {
-        // 💡 승리 문구에도 실제 닉네임이 나오도록 변경
+        string hostNick = GetHostNickName();
+        string guestNick = GetGuestNickName();
+        string winMessage = "";
+
         if (hostTime < guestTime)
         {
             hostScore++;
-            centerInfoText.text = $"{GetHostNickName()} WIN!";
+            winMessage = $" {hostNick} WIN! ";
         }
         else if (guestTime < hostTime)
         {
             guestScore++;
-            centerInfoText.text = $"{GetGuestNickName()} WIN!";
+            winMessage = $"{guestNick} WIN! ";
         }
         else
         {
-            centerInfoText.text = "DRAW!";
+            winMessage = "DRAW!";
         }
 
-        // 최종 스코어 갱신
-        hostInfoText.text = $"{GetHostNickName()}: {hostTime:F3}\nScore: {hostScore}";
-        guestInfoText.text = $"{GetGuestNickName()}: {guestTime:F3}\nScore: {guestScore}";
+        // 💡 둘 다 클릭 완료 시 패널을 켜고, 텍스트에 결과를 뿌려줍니다.
+        if (resultPanel != null)
+        {
+            resultPanel.SetActive(true);
+
+            if (resultMessageText != null)
+                resultMessageText.text = winMessage;
+
+            if (hostResultText != null)
+                hostResultText.text = $"[{hostNick}]\n{Mathf.RoundToInt(hostTime * 1000f)}ms";
+
+            if (guestResultText != null)
+                guestResultText.text = $"[{guestNick}]\n{Mathf.RoundToInt(guestTime * 1000f)}ms";
+        }
 
         StartCoroutine(NextRoundDelay());
     }
 
     private IEnumerator NextRoundDelay()
     {
-        // 결과를 3초 동안 띄워둠
-        yield return new WaitForSeconds(3f);
+        // 💡 결과창을 여유 있게 볼 수 있도록 5초 대기 후 에이밍 게임으로 이동
+        yield return new WaitForSeconds(5f);
 
-        // 💡 방장만 다음 씬으로 모두를 데려감
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.Log("두 번째 게임: 에이밍 대결로 넘어갑니다!");
-            PhotonNetwork.LoadLevel("AimingGameScene"); // 실제 에이밍 씬 이름으로 변경!
+            PhotonNetwork.LoadLevel("AimingGameScene");
         }
-    }   
+    }
 }

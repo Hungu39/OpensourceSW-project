@@ -257,7 +257,7 @@ public class TypingGameManager : MonoBehaviourPun
 
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("LobbyScene");
+            PhotonNetwork.LoadLevel("WaitingRoomScene");
         }
     }
 }
