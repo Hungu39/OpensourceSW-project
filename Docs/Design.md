@@ -84,3 +84,72 @@
 Connection MasterServer Use case에서의 Sequence Diagram이다. 플레이어가 게임을 시작(`Start()`)하면 LobbyManager에서 포톤 서버로 접속(`ConnectUsingSettings()`)을 요청한다. 
 
 포톤 서버와의 네트워크 연결에 성공하여 서버로부터 확인(`OnConnectedToMaster()`)을 받으면, LobbyManager는 즉시 로비 참가를 위한 명령(`JoinLobby()`)을 서버에 전달한다. 반대로 연결에 실패하여 서버로부터 끊김 판정(`OnDisconnected()`)을 받게 되면, 접속에 성공할 때까지 지속적으로 재접속(`ConnectUsingSettings()`)을 시도하는 루프(Loop) 과정을 수행한다.
+
+<br>
+
+#### 2) SetNickname
+<img src="../Images/Usecase2 sequence diagram.png" width="800">
+
+SetNickname Use case에서의 Sequence Diagram이다. 플레이어가 닉네임을 입력하고 방 만들기 또는 방 입장 버튼을 누르면, LobbyManager에서 입력된 닉네임의 유효성 검사(VerifyNickname)를 수행한다. 
+
+만약 닉네임을 입력하지 않은 상태(`[닉네임 안썼을때]`)라면 LobbyManager는 에러 팝업창을 띄우고(`ErrorPopup.SetActive(true)`) 로직을 중단(`return`)한다. 반대로 닉네임이 정상적으로 입력된 상태(`[else]`)라면, 포톤 서버에 해당 닉네임을 할당한 후 서버로 방 생성 또는 방 참가(`CreateRoom(), JoinRandomRoom()`)를 요청한다.
+
+<br>
+
+#### 3, 4) Create Room & Join Gameroom
+<img src="../Images/Usecase34 sequence diagram.png" width="800">
+
+Create Room 및 Join Gameroom Use case를 통합한 Sequence Diagram이다. 플레이어가 닉네임을 입력하면(`NickName = nicknameInputField.text`), LobbyManager는 가장 먼저 닉네임 누락 여부를 확인한다. 
+
+닉네임이 비어있는 경우 에러 팝업(`ErrorPopup`)을 띄워 로직을 처리한다. 닉네임이 정상적으로 입력된 상태(`[else]`)에서 서버에 참여할 수 있는 방이 없을 경우, 플레이어의 방 만들기 입력(`OnClickCreateRoom`)을 받아 포톤 서버에 새로운 방 생성(`CreateRoom`)을 요청한다. 반대로 참여 가능한 방이 이미 존재하는 경우(`[else]`), 방 참가 입력(`OnClickJoinRoom`)을 받아 서버에 무작위 방 입장(`JoinRandomRoom`)을 요청한다.
+
+<br>
+
+#### 5) Start Game
+<img src="../Images/Usecase5 sequence diagram.png" width="800">
+
+Start Game Use case에서의 Sequence Diagram이다. 방장(Master Client)이 대기방에 있는 모든 플레이어가 준비되었는지 상태를 확인(`CheckReadyStatus`)한다. 
+
+만약 모든 인원이 준비를 완료한 상태(`[allready == true]`)라면, 방장의 시작 버튼 클릭(`OnClickAction`)을 받아 WaitingRoomManager가 포톤 서버에 첫 번째 미니게임 씬으로의 전환(`LoadLevel("ReactionGameScene")`)을 요청한다. 반대로 모든 인원이 준비되지 않은 경우(`[else]`), WaitingRoomManager는 시작 버튼을 비활성화(`actionButton.interactable = false`)하여 게임이 시작되지 않도록 제어한다.
+
+<br>
+
+#### 6) ReactionSpeedTest
+<img src="../Images/Usecase6 sequence diagram.png" width="800">
+
+ReactionSpeedTest Use case에서의 Sequence Diagram이다. ReactionGameManager가 새로운 라운드를 시작(`StartNewRound`)하고, 무작위 대기 시간이 지나면 플레이어의 화면을 붉은색으로 변경하는 신호(`RPC_TurnRed`)를 보낸다. 
+
+이를 본 플레이어가 화면을 클릭(`OnScreenClicked`)하면, ReactionGameManager는 클릭한 타이밍의 유효성을 검사(`CheckClickTiming`)한다. 화면이 붉게 변하기 전 대기 상태(`[isWaitingRed == true]`)에서 클릭했다면 부정 출발(`FailStart`)로 처리된다. 반대로 신호가 변경된 후 정상적으로 클릭했다면(`[else]`), 포톤 서버를 통해 자신의 반응 측정 시간을 전송(`RPC_SubmitTime`)한다.
+
+이후 두 플레이어의 기록이 모두 제출되어 종료 조건(`[submitCount == 2]`)이 충족되면, 승자를 판별(`DetermineWinner`)한 뒤 다음 라운드인 에이밍 게임 씬으로 이동(`LoadLevel("AimingGameScene")`)한다.
+
+<br>
+
+#### 7) AimingTest
+<img src="../Images/Usecase7 sequence diagram.png" width="800">
+
+AimingTest Use case에서의 Sequence Diagram이다. 플레이어가 표적을 성공적으로 클릭(`[타겟 클릭 성공]`)하면 `OnTargetClicked` 입력이 전달되고, AimingGameManager는 포톤 서버를 통해 실시간으로 점수를 동기화(`RPC_AddAimingScore`)한 뒤 로컬 점수를 갱신(`UpdateScore`)한다.
+
+동시에 게임 타이머를 확인(`CheckTimer`)하여 제한 시간이 남아있는 경우(`[GameTime > 0]`)에는 게임을 계속 진행한다. 반대로 제한 시간이 모두 종료된 경우(`[else]`), AimingGameManager는 승자를 판별(`DetermineWinner`)한 뒤 TotalScoreManager에 누적 승점(`totalscore++`)을 업데이트한다. 이후 다음 라운드를 준비(`GotoTypingGame`)하며 서버에 타자 게임 씬으로의 전환(`Loadlevel("TypingGameScene")`)을 요청한다.
+
+<br>
+
+#### 8) TypingTest
+<img src="../Images/Usecase8 sequence diagram.png" width="800">
+
+TypingTest Use case에서의 Sequence Diagram이다. 게임이 시작되면 TypingGameManager는 화면에 단어를 생성(`SpawnInitialWords`)하고, 양쪽 플레이어의 화면이 동일하도록 서버에 동기화(`RPC_SyncInitialWords`)를 요청한다.
+
+플레이어가 단어를 입력하고 제출(`OnInputSubmit`)하면, 시스템은 입력값의 유효성을 검사(`CheckTypingInput`)한다. 입력한 단어가 화면에 존재하는 정답일 경우(`[입력한 단어가 화면에 존재할때]`), 서버를 통해 해당 단어의 소유권을 가져오고(`RPC_StealWord`) 입력창을 초기화(`ResetInputFieldCoroutine`)한다. 만약 오타이거나 없는 단어일 경우(`[else]`), 점수 획득 없이 입력창만 초기화한다.
+
+동시에 게임 타이머를 확인(`CheckGameend`)하여 시간이 남아있다면(`[GameTime > 0]`) 게임을 계속 진행한다. 제한 시간이 종료되면(`[else]`), 승자를 판별(`DetermineWinner`)하여 TotalScoreManager에 점수를 업데이트(`UpdateScore`)한다. 마지막으로 모든 미니게임 종료 루틴을 실행(`EndAllGames`)한 뒤, 서버에 최종 결과창 씬으로의 전환(`LoadLevel("FinalResultScene")`)을 요청한다.
+
+<br>
+
+#### 9) View Result
+<img src="../Images/Usecase9 sequence diagram.png" width="800">
+
+View Result Use case에서의 Sequence Diagram이다. 결과 화면에 진입하면 FinalResultManager는 가장 먼저 TotalScoreManager에게 최종 누적 점수 데이터를 요청(`점수데이터요청`)한다.
+
+이후 두 플레이어의 점수를 비교(`DetermineFinalWinner`)하여 방장의 점수가 더 높으면(`[finalHost > finalGuest]`) 방장 승리를, 게스트의 점수가 더 높으면(`[finalGuest > finalHost]`) 게스트 승리를 `winnerText.text`에 띄워주고, 동점일 경우(`[else]`) 무승부(`draw`)를 화면에 출력한다. 
+
+결과 출력 후, 대기방으로 돌아가기 위한 대기 시간 코루틴을 실행(`StartCoroutine(ReturnToWaitingRoom())`)하고, 다음 게임을 위해 TotalScoreManager의 점수를 0으로 초기화(`ResetScore`)한다. 마지막으로 현재 클라이언트가 방장일 경우에만(`[PhotonNetwork.IsMasterClient == true]`), 포톤 서버에 대기방 씬으로의 씬 전환(`LoadLevel("WaitingRoomScene")`)을 요청하여 두 플레이어를 자동으로 복귀시킨다.
