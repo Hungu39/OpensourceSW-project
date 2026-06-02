@@ -73,3 +73,14 @@
 | :--- | :--- |
 | **TotalScoreManager** | 3개의 라운드가 진행되는 동안 각 미니게임에서 획득한 승점을 누적하여 저장하는 데이터 클래스이다.<br><br>+ `hostTotalScore / guestTotalScore`: 방장과 게스트의 누적 승점을 저장하는 변수이다.<br>+ `ResetScores()`: 모든 게임이 끝나고 다음 게임을 위해 누적 점수를 초기화한다. |
 | **FinalResultManager** | 모든 미니게임 라운드가 종료된 후 최종 승패를 계산하여 UI에 출력하고 씬을 제어하는 클래스이다.<br><br>+ `Start()`: 씬 로드 시 TotalScoreManager의 데이터를 바탕으로 승자를 판별한다.<br>+ `ReturnToWaitingRoom()`: 결과를 일정 시간 출력한 뒤 자동으로 대기방 씬으로 플레이어들을 복귀시킨다. |
+
+<br>
+
+### 3. Sequence diagram
+
+#### 1) Connection MasterServer
+<img src="../Images/Usecase1 sequence diagram.png" width="800">
+
+Connection MasterServer Use case에서의 Sequence Diagram이다. 플레이어가 게임을 시작(`Start()`)하면 LobbyManager에서 포톤 서버로 접속(`ConnectUsingSettings()`)을 요청한다. 
+
+포톤 서버와의 네트워크 연결에 성공하여 서버로부터 확인(`OnConnectedToMaster()`)을 받으면, LobbyManager는 즉시 로비 참가를 위한 명령(`JoinLobby()`)을 서버에 전달한다. 반대로 연결에 실패하여 서버로부터 끊김 판정(`OnDisconnected()`)을 받게 되면, 접속에 성공할 때까지 지속적으로 재접속(`ConnectUsingSettings()`)을 시도하는 루프(Loop) 과정을 수행한다.
