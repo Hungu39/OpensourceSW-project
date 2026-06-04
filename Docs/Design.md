@@ -77,7 +77,7 @@
 
 <br>
 
-### 3. Sequence diagram
+## 3. Sequence diagram
 
 #### 1) Connection MasterServer
 <img src="../Images/Usecase1 sequence diagram.png" width="800">
@@ -88,7 +88,7 @@ Connection MasterServer Use case에서의 Sequence Diagram이다. 플레이어�
 
 <br>
 
-#### 2) SetNickname
+### 2) SetNickname
 <img src="../Images/Usecase2 sequence diagram.png" width="800">
 
 SetNickname Use case에서의 Sequence Diagram이다. 플레이어가 닉네임을 입력하고 방 만들기 또는 방 입장 버튼을 누르면, LobbyManager에서 입력된 닉네임의 유효성 검사(VerifyNickname)를 수행한다. 
@@ -97,7 +97,7 @@ SetNickname Use case에서의 Sequence Diagram이다. 플레이어가 닉네임�
 
 <br>
 
-#### 3, 4) Create Room & Join Gameroom
+### 3, 4) Create Room & Join Gameroom
 <img src="../Images/Usecase34 sequence diagram.png" width="800">
 
 Create Room 및 Join Gameroom Use case를 통합한 Sequence Diagram이다. 플레이어가 닉네임을 입력하면(`NickName = nicknameInputField.text`), LobbyManager는 가장 먼저 닉네임 누락 여부를 확인한다. 
@@ -106,7 +106,7 @@ Create Room 및 Join Gameroom Use case를 통합한 Sequence Diagram이다. 플�
 
 <br>
 
-#### 5) Start Game
+### 5) Start Game
 <img src="../Images/Usecase5 sequence diagram.png" width="800">
 
 Start Game Use case에서의 Sequence Diagram이다. 방장(Master Client)이 대기방에 있는 모든 플레이어가 준비되었는지 상태를 확인(`CheckReadyStatus`)한다. 
@@ -115,7 +115,7 @@ Start Game Use case에서의 Sequence Diagram이다. 방장(Master Client)이 �
 
 <br>
 
-#### 6) ReactionSpeedTest
+### 6) ReactionSpeedTest
 <img src="../Images/Usecase6 sequence diagram.png" width="800">
 
 ReactionSpeedTest Use case에서의 Sequence Diagram이다. ReactionGameManager가 새로운 라운드를 시작(`StartNewRound`)하고, 무작위 대기 시간이 지나면 플레이어의 화면을 붉은색으로 변경하는 신호(`RPC_TurnRed`)를 보낸다. 
@@ -126,7 +126,7 @@ ReactionSpeedTest Use case에서의 Sequence Diagram이다. ReactionGameManager�
 
 <br>
 
-#### 7) AimingTest
+### 7) AimingTest
 <img src="../Images/Usecase7 sequence diagram.png" width="800">
 
 AimingTest Use case에서의 Sequence Diagram이다. 플레이어가 표적을 성공적으로 클릭(`[타겟 클릭 성공]`)하면 `OnTargetClicked` 입력이 전달되고, AimingGameManager는 포톤 서버를 통해 실시간으로 점수를 동기화(`RPC_AddAimingScore`)한 뒤 로컬 점수를 갱신(`UpdateScore`)한다.
@@ -135,7 +135,7 @@ AimingTest Use case에서의 Sequence Diagram이다. 플레이어가 표적을 �
 
 <br>
 
-#### 8) TypingTest
+### 8) TypingTest
 <img src="../Images/Usecase8 sequence diagram.png" width="800">
 
 TypingTest Use case에서의 Sequence Diagram이다. 게임이 시작되면 TypingGameManager는 화면에 단어를 생성(`SpawnInitialWords`)하고, 양쪽 플레이어의 화면이 동일하도록 서버에 동기화(`RPC_SyncInitialWords`)를 요청한다.
@@ -146,7 +146,7 @@ TypingTest Use case에서의 Sequence Diagram이다. 게임이 시작되면 Typi
 
 <br>
 
-#### 9) View Result
+### 9) View Result
 <img src="../Images/Usecase9 sequence diagram.png" width="800">
 
 View Result Use case에서의 Sequence Diagram이다. 결과 화면에 진입하면 FinalResultManager는 가장 먼저 TotalScoreManager에게 최종 누적 점수 데이터를 요청(`점수데이터요청`)한다.
@@ -157,5 +157,47 @@ View Result Use case에서의 Sequence Diagram이다. 결과 화면에 진입하
 
 <br>
 
-### 4. State machine diagram
+## 4. State machine diagram
 <img src="../Images/statemachine.png" width="800">
+
+유저가 시스템을 시작(SystemStart)하면 가장 먼저 마스터 서버와 접속(ConnectionMasterServer)을 시도한다. 서버 접속에 성공한 후 닉네임을 설정하면 로비(Lobby)에 진입하게 된다. 로비 화면에서는 방 만들기(Click CreateRoom)를 통해 새로운 방(CreateRoom)을 생성하여 대기방(Waiting Room)으로 이동하거나, 방 참가(Click JoinRoom)를 통해 기존에 만들어진 방(JoinRoom)에 접속하여 대기방으로 이동한다.
+
+대기방에 유저들이 모여 모든 준비를 완료하면(allready == true), 방장이 게임 시작(GameStart)을 요청하여 본격적인 게임 플레이(Game Play) 상태로 진입하게 된다. 게임 플레이 상태 내부에서는 3가지 미니게임이 순차적으로 진행된다. 가장 먼저 반응속도 게임(Reaction Game)이 시작되며, 두 유저가 모두 기록 제출을 완료하면(submitCount == 2) 승자를 판별(DetermineWinner)한 뒤 에이밍 게임(Aiming Game)으로 전환된다. 에이밍 게임의 제한 시간이 끝나면(GameTime <= 0) 승자를 판별하고 타자 게임(Typing Game)으로 이동하며, 타자 게임 역시 제한 시간이 종료되면 승자를 판별하고 미니게임 세션이 모두 끝난다.
+
+게임이 종료되면 최종 결과(Final Result) 상태로 넘어가 누적 점수에 기반한 최종 승패를 화면에서 확인한다. 결과창이 표시된 이후에는 다시 대기방(Waiting Room)으로 자동 복귀하여 다음 매치를 준비할 수 있는 순환 구조를 가진다. 마지막으로, 게임 대기 중 유저가 방 나가기(LeaveRoom)를 선택하면 룸에서 퇴장하며 세션이 종료된다.
+
+<br>
+
+## 5. Implementation requirements
+
+### 5.1 H/W platform requirements
+* **CPU:** Intel Core i3 이상 (또는 동급 AMD 프로세서) 
+* **RAM:** 4GB 이상
+* **Storage:** 500MB 이상의 여유 공간
+* **Network:** 인터넷 연결 필수
+
+### 5.2 S/W platform requirements
+* **OS:** Windows 10 이상 
+* **Implement Language:** C# (Unity) 
+* **Game Engine:** Unity 
+* **Network Engine:** Photon PUN 2
+
+<br>
+
+## 6. Glossary
+
+* **Unity:** 게임 개발을 위한 통합개발환경 및 게임 엔진
+* **GameObject:** 게임 세계에서 표현되는 모든 객체를 말하며, 스크립트와 상호작용하여 동작하는 기본 단위
+* **Photon (PUN 2):** 유니티 환경에서 안정적인 실시간 멀티플레이 네트워크 동기화를 구현하기 위해 사용하는 서버 엔진
+* **RPC (Remote Procedure Call):** 원격 프로시저 호출. 특정 클라이언트에서 발생한 이벤트를 다른 모든 클라이언트의 화면에서도 동일하게 실행시켜 상태를 동기화하는 네트워크 기법
+* **Sequence Diagram:** 객체 간의 동적 상호작용을 시간적 개념으로 모델링하여 나타낸 다이어그램
+* **State Machine Diagram:** 객체 Life Time 동안 변화될 수 있는 모든 상태를 정의해 둔 다이어그램
+
+<br>
+
+## 7. References
+
+* **강의자료:** Structural Modeling II, Behavior Modeling I, II
+* **참고자료:**
+    * Unity Official Documentation: https://docs.unity3d.com/ 
+    * Photon Engine Documentation: https://doc.photonengine.com/ 
