@@ -154,3 +154,8 @@ View Result Use case에서의 Sequence Diagram이다. 결과 화면에 진입하
 이후 두 플레이어의 점수를 비교(`DetermineFinalWinner`)하여 방장의 점수가 더 높으면(`[finalHost > finalGuest]`) 방장 승리를, 게스트의 점수가 더 높으면(`[finalGuest > finalHost]`) 게스트 승리를 `winnerText.text`에 띄워주고, 동점일 경우(`[else]`) 무승부(`draw`)를 화면에 출력한다. 
 
 결과 출력 후, 대기방으로 돌아가기 위한 대기 시간 코루틴을 실행(`StartCoroutine(ReturnToWaitingRoom())`)하고, 다음 게임을 위해 TotalScoreManager의 점수를 0으로 초기화(`ResetScore`)한다. 마지막으로 현재 클라이언트가 방장일 경우에만(`[PhotonNetwork.IsMasterClient == true]`), 포톤 서버에 대기방 씬으로의 씬 전환(`LoadLevel("WaitingRoomScene")`)을 요청하여 두 플레이어를 자동으로 복귀시킨다.
+
+<br>
+
+### 4. State machine diagram
+<img src="../Images/statemachine.png" width="800">
