@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TypingGameScene.unity
     guid: fadb03c7f4d0a714e809ae73a24fddff
+  - enabled: 1
+    path: Assets/Scenes/FinalResultScene.unity
+    guid: e472cb782ea79d6478f41f4e2ab5779b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

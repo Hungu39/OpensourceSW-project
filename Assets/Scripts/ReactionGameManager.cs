@@ -20,7 +20,7 @@ public class ReactionGameManager : MonoBehaviourPun
     private int hostScore = 0;
     private int guestScore = 0;
 
-    private bool isWaitingForRed = false;
+    private bool isWaitingRed = false;
     private bool isRedScreen = false;
 
     private float startTime;
@@ -56,7 +56,7 @@ public class ReactionGameManager : MonoBehaviourPun
 
     void StartNewRound()
     {
-        isWaitingForRed = true;
+        isWaitingRed = true;
         isRedScreen = false;
         submitCount = 0;
         hostTime = 0f;
@@ -84,7 +84,7 @@ public class ReactionGameManager : MonoBehaviourPun
     [PunRPC]
     void RPC_TurnRed()
     {
-        isWaitingForRed = false;
+        isWaitingRed = false;
         isRedScreen = true;
 
         backgroundButtonImage.color = Color.red;
@@ -95,7 +95,7 @@ public class ReactionGameManager : MonoBehaviourPun
 
     public void OnScreenClicked()
     {
-        if (isWaitingForRed)
+        if (isWaitingRed)
         {
             Debug.Log("FAIL START!");
             return;
@@ -139,11 +139,13 @@ public class ReactionGameManager : MonoBehaviourPun
         if (hostTime < guestTime)
         {
             hostScore++;
+            TotalScoreManager.hostTotalScore++;
             winMessage = $" {hostNick} WIN! ";
         }
         else if (guestTime < hostTime)
         {
             guestScore++;
+            TotalScoreManager.guestTotalScore++;
             winMessage = $"{guestNick} WIN! ";
         }
         else

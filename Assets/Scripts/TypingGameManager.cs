@@ -224,11 +224,13 @@ public class TypingGameManager : MonoBehaviourPun
         {
             if (hostResultText != null) { hostResultText.text = "WIN"; hostResultText.color = Color.yellow; }
             if (guestResultText != null) { guestResultText.text = "LOSE"; guestResultText.color = Color.gray; }
+            TotalScoreManager.hostTotalScore++;
         }
         else if (guestScore > hostScore)
         {
             if (hostResultText != null) { hostResultText.text = "LOSE"; hostResultText.color = Color.gray; }
             if (guestResultText != null) { guestResultText.text = "WIN"; guestResultText.color = Color.yellow; }
+            TotalScoreManager.guestTotalScore++;
         }
         else
         {
@@ -257,7 +259,7 @@ public class TypingGameManager : MonoBehaviourPun
 
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("WaitingRoomScene");
+            PhotonNetwork.LoadLevel("FinalResultScene");
         }
     }
 }

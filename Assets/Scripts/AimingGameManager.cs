@@ -148,9 +148,15 @@ public class AimingGameManager : MonoBehaviourPun
         string guestNick = GetGuestNickName();
         string winMessage = "";
 
-        if (hostScore > guestScore) winMessage = $"👑 {hostNick} WIN! 👑";
-        else if (guestScore > hostScore) winMessage = $"👑 {guestNick} WIN! 👑";
-        else winMessage = "🤝 DRAW! 🤝";
+        if (hostScore > guestScore) {
+            winMessage = $"{hostNick} WIN!";
+            TotalScoreManager.hostTotalScore++;
+        }
+        else if (guestScore > hostScore){
+            winMessage = $"{guestNick} WIN!";
+            TotalScoreManager.guestTotalScore++;
+        }
+        else winMessage = "DRAW...";
 
         if (resultPanel != null && resultMessageText != null)
         {
